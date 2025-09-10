@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import Navigation from '@/components/Navigation';
-import AddFieldModal from '@/components/AddFieldModal';
-import AlertsSection from '@/components/AlertsSection';
 import { 
   Sprout, 
   CloudRain, 
@@ -58,21 +56,10 @@ const mockFieldsData = [
 const Dashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [fieldsData, setFieldsData] = useState(mockFieldsData);
-  const [isAddFieldModalOpen, setIsAddFieldModalOpen] = useState(false);
 
-  const totalFields = fieldsData.length;
-  const totalSize = fieldsData.reduce((sum, field) => sum + field.size, 0);
-  const activePredictions = fieldsData.filter(field => field.lastPrediction).length;
-
-  const handleFieldAdded = (newField: any) => {
-    setFieldsData(prev => [...prev, newField]);
-  };
-
-  const handleAlertAcknowledge = (alertId: number) => {
-    // Handle alert acknowledgment
-    console.log('Alert acknowledged:', alertId);
-  };
+  const totalFields = mockFieldsData.length;
+  const totalSize = mockFieldsData.reduce((sum, field) => sum + field.size, 0);
+  const activePredictions = mockFieldsData.filter(field => field.lastPrediction).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -207,12 +194,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button 
-                  variant="farmer" 
-                  size="lg" 
-                  className="h-16"
-                  onClick={() => setIsAddFieldModalOpen(true)}
-                >
+                <Button variant="farmer" size="lg" className="h-16">
                   <Plus className="h-6 w-6 mr-2" />
                   {t('dashboard.addField')}
                 </Button>
@@ -230,20 +212,11 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* Alerts Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <AlertsSection onAlertAcknowledge={handleAlertAcknowledge} />
-        </motion.div>
-
         {/* Recent Fields */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.4 }}
         >
           <Card className="shadow-card">
             <CardHeader>
@@ -256,12 +229,12 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {fieldsData.map((field, index) => (
+                {mockFieldsData.map((field, index) => (
                   <motion.div
                     key={field.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 + index * 0.1 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
@@ -277,10 +250,10 @@ const Dashboard = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium">
-                        {field.lastPrediction?.yield || 'N/A'} q/ha
+                        {field.lastPrediction?.yield} q/ha
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {field.lastPrediction ? Math.round(field.lastPrediction.confidence * 100) + '% confidence' : 'No prediction yet'}
+                        {Math.round(field.lastPrediction?.confidence * 100)}% confidence
                       </p>
                     </div>
                   </motion.div>
@@ -290,13 +263,6 @@ const Dashboard = () => {
           </Card>
         </motion.div>
       </div>
-
-      {/* Add Field Modal */}
-      <AddFieldModal
-        isOpen={isAddFieldModalOpen}
-        onClose={() => setIsAddFieldModalOpen(false)}
-        onFieldAdded={handleFieldAdded}
-      />
     </div>
   );
 };
